@@ -6,5 +6,5 @@ The project is broken up into two parts, the tranmitter (which would generate an
 
 ## Authors
 
-* **Ajene*
+* **Ajene**
 * **Thomas**
