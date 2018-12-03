@@ -24,27 +24,45 @@ class ViewController: NSViewController {
     var tracker: AKFrequencyTracker!
     var silence: AKBooster!
     var counter = 0
+    var fft: AKFFTTap!
+    var booster: AKBooster!
     let noteFrequencies = [16.35, 17.32, 18.35, 19.45, 20.6, 21.83, 23.12, 24.5, 25.96, 27.5, 29.14, 30.87]
     
     func setupPlot() {
-        let plot = AKNodeOutputPlot(mic, frame: audioInputPlot.bounds)
+//        let plot = AKNodeOutputPlot(mic, frame: audioInputPlot.bounds)
 //        let fft = AKFFTTap(mic)
-//        let plot = AKNodeFFTPlot(mic, frame: audioInputPlot.bounds)
-        plot.plotType = .rolling
+        
+        
+//        plot.plotType = .rolling
+//        plot.shouldFill = true
+//        plot.shouldMirror = true
+//        plot.color = NSColor.blue
+//        plot.autoresizingMask = NSView.AutoresizingMask.width
+//        audioInputPlot.addSubview(plot)
+        
+        //FFT Plot
+        let plot = AKNodeFFTPlot(mic, frame: audioInputPlot.bounds)
         plot.shouldFill = true
-        plot.shouldMirror = true
-        plot.color = NSColor.blue
+        plot.shouldMirror = false
+        plot.shouldCenterYAxis = false
+        plot.color = AKColor.purple
+        plot.gain = 100
         plot.autoresizingMask = NSView.AutoresizingMask.width
         audioInputPlot.addSubview(plot)
-//        audioInputPlot.addSubview(plot2)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         AKSettings.audioInputEnabled = true
         mic = AKMicrophone()
-        tracker = AKFrequencyTracker(mic)
+        booster = AKBooster(mic)
+        
+        tracker = AKFrequencyTracker.init(mic, hopSize: 4096, peakCount: 1)
         silence = AKBooster(tracker, gain: 0)
+        fft = AKFFTTap(tracker)
+        
+        
+//        print(fft.fftData.max)
     }
 
     override func viewDidAppear() {
@@ -56,7 +74,7 @@ class ViewController: NSViewController {
             AKLog("AudioKit did not start!")
         }
         setupPlot()
-        Timer.scheduledTimer(timeInterval: 1,
+        Timer.scheduledTimer(timeInterval: 0.2,
                              target: self,
                              selector: #selector(ViewController.updateUI),
                              userInfo: nil,
@@ -70,41 +88,47 @@ class ViewController: NSViewController {
     }
 
     @objc func updateUI() {
-        if tracker.amplitude > 0.1 {
-            
-            frequencyLabel.stringValue = String(format: "%0.1f", tracker.frequency)
-
-            var frequency = Float(tracker.frequency)
-            while frequency > Float(noteFrequencies[noteFrequencies.count - 1]) {
-                frequency /= 2.0
-            }
-            while frequency < Float(noteFrequencies[0]) {
-                frequency *= 2.0
-            }
-            if(tracker.frequency >= 14500 && tracker.frequency <= 15499) {
-                counter+=1
-                print(0, terminator:" ")
-            }
-            if(tracker.frequency >= 15500 && tracker.frequency <= 17500) {
-                counter+=1
-                print(1, terminator:" ")
-            }
-            if(counter == 14){
-                print()
-                counter = 0
-            }
-            var minDistance: Float = 10_000.0
-            var index = 0
-
-            for i in 0..<noteFrequencies.count {
-                let distance = fabsf(Float(noteFrequencies[i]) - frequency)
-                if distance < minDistance {
-                    index = i
-                    minDistance = distance
-                }
-            }
-
+        //Don't check for the amplitude
+        if(tracker.frequency >= 14500 && tracker.frequency <= 15499) {
+            counter+=1
+            print(0, terminator:" ")
+            print(fft.fftData.max()!)
         }
+        else if(tracker.frequency >= 15500 && tracker.frequency <= 17500) {
+            counter+=1
+            print(1, terminator:" ")
+            print(fft.fftData.max()!)
+        }
+        
+        if(counter == 14){
+            print()
+            counter = 0
+        }
+//        if tracker.amplitude > 0.1 {
+//
+//            frequencyLabel.stringValue = String(format: "%0.1f", tracker.frequency)
+//
+//            var frequency = Float(tracker.frequency)
+//            while frequency > Float(noteFrequencies[noteFrequencies.count - 1]) {
+//                frequency /= 2.0
+//            }
+//            while frequency < Float(noteFrequencies[0]) {
+//                frequency *= 2.0
+//            }
+//
+//            var minDistance: Float = 10_000.0
+//            var index = 0
+//
+//            for i in 0..<noteFrequencies.count {
+//                let distance = fabsf(Float(noteFrequencies[i]) - frequency)
+//                if distance < minDistance {
+//                    index = i
+//                    minDistance = distance
+//                }
+//            }
+//
+//        }
+        
         
         amplitudeLabel.stringValue = String(format: "%0.2f", tracker.amplitude)
     }
