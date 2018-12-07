@@ -26,7 +26,8 @@ class ViewController: NSViewController {
     var counter = 0
     var fft: AKFFTTap!
     var booster: AKBooster!
-    let noteFrequencies = [16.35, 17.32, 18.35, 19.45, 20.6, 21.83, 23.12, 24.5, 25.96, 27.5, 29.14, 30.87]
+    var frequencyArray: [Double] = []
+//    let noteFrequencies = [16.35, 17.32, 18.35, 19.45, 20.6, 21.83, 23.12, 24.5, 25.96, 27.5, 29.14, 30.87]
     
     func setupPlot() {
 //        let plot = AKNodeOutputPlot(mic, frame: audioInputPlot.bounds)
@@ -41,7 +42,8 @@ class ViewController: NSViewController {
 //        audioInputPlot.addSubview(plot)
         
         //FFT Plot
-        let plot = AKNodeFFTPlot(mic, frame: audioInputPlot.bounds)
+        let plot = AKNodeFFTPlot(booster, frame: audioInputPlot.bounds)
+        plot.plotType = .rolling
         plot.shouldFill = true
         plot.shouldMirror = false
         plot.shouldCenterYAxis = false
@@ -57,12 +59,9 @@ class ViewController: NSViewController {
         mic = AKMicrophone()
         booster = AKBooster(mic)
         
-        tracker = AKFrequencyTracker.init(mic, hopSize: 4096, peakCount: 1)
+        tracker = AKFrequencyTracker.init(booster, hopSize: 4096, peakCount: 1)
         silence = AKBooster(tracker, gain: 0)
         fft = AKFFTTap(tracker)
-        
-        
-//        print(fft.fftData.max)
     }
 
     override func viewDidAppear() {
@@ -74,7 +73,7 @@ class ViewController: NSViewController {
             AKLog("AudioKit did not start!")
         }
         setupPlot()
-        Timer.scheduledTimer(timeInterval: 0.2,
+        Timer.scheduledTimer(timeInterval: 2,
                              target: self,
                              selector: #selector(ViewController.updateUI),
                              userInfo: nil,
@@ -92,17 +91,21 @@ class ViewController: NSViewController {
         if(tracker.frequency >= 14500 && tracker.frequency <= 15499) {
             counter+=1
             print(0, terminator:" ")
-            print(fft.fftData.max()!)
+            frequencyArray.append(tracker.frequency)
+//            print(fft.fftData)
         }
         else if(tracker.frequency >= 15500 && tracker.frequency <= 17500) {
             counter+=1
             print(1, terminator:" ")
-            print(fft.fftData.max()!)
+            frequencyArray.append(tracker.frequency)
+//            print(fft.fftData)
         }
         
         if(counter == 14){
             print()
             counter = 0
+            print(frequencyArray)
+            frequencyArray.removeAll()
         }
 //        if tracker.amplitude > 0.1 {
 //
