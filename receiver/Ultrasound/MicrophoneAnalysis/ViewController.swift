@@ -57,8 +57,23 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         AKSettings.audioInputEnabled = true
         mic = AKMicrophone()
+//        do {
+////            print(AKAudioFile.BaseDirectory.documents)
+//            let cachedFile = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(remote.lastPathComponent)
+//            try? data.write(to: cachedFile)
+//            let player = AKPlayer(url: cachedFile)
+//            let filePath = "/Users/ajenejohnson/ultrasonic_sensor/sound_samples.HF17-LF15-DUR_2ms.wav"
+//            let file = wavFile.path(forResource: filePath, ofType: "wav")
+//            player = try AKAudioPlayer(file: AKAudioFile(readFileName: file!))
+//            booster = AKBooster(player)
+//            tracker = AKFrequencyTracker.init(booster, hopSize: 4096, peakCount: 1)
+//            silence = AKBooster(tracker, gain: 0)
+//            fft = AKFFTTap(tracker)
+//        } catch let error as NSError {
+//            print("There's an error: \(error)")
+//        }
         booster = AKBooster(mic)
-        
+
         tracker = AKFrequencyTracker.init(booster, hopSize: 4096, peakCount: 1)
         silence = AKBooster(tracker, gain: 0)
         fft = AKFFTTap(tracker)
@@ -73,7 +88,7 @@ class ViewController: NSViewController {
             AKLog("AudioKit did not start!")
         }
         setupPlot()
-        Timer.scheduledTimer(timeInterval: 2,
+        Timer.scheduledTimer(timeInterval: 0.2,
                              target: self,
                              selector: #selector(ViewController.updateUI),
                              userInfo: nil,
