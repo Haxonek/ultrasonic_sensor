@@ -117,14 +117,15 @@ spectrum(tones,Fs,'spectrogram','Leakage',1,'OverlapPercent',0, ...
 
 format long
 
-[x, fs] = audioread('sound_samples/HF17-LF15-DUR_2ms.wav');
+[x, fs] = audioread('sound_samples/HF17-LF15-DUR-1s.wav');
 
 % x = x((4*fs):length(x)-(2*fs), 1); % 1 s plot
-x = x((4*fs):(6*fs), 1);
+% x = x((5.22*fs):(5.29*fs), 1); % .2ms plot
+x = x(:, 1); % 20ms plot
 
-wlen = 2^2;                        % window length (recomended to be power of 2) 2^10
-hop = wlen/2;                       % hop size (recomended to be power of 2) 2^2
-nfft = 2^12;                        % number of fft points (recomended to be power of 2) 2^12
+wlen = 2^10;                        % window length (recomended to be power of 2) 2^10
+hop = wlen/2^2;                       % hop size (recomended to be power of 2) 2^2
+nfft = 2^12; % 14                        % number of fft points (recomended to be power of 2) 2^12
 
 % perform STFT
 win = blackman(wlen, 'periodic');
@@ -161,19 +162,6 @@ title('Amplitude spectrogram of the signal')
 hcol = colorbar;
 set(hcol, 'FontName', 'Times New Roman', 'FontSize', 14)
 ylabel(hcol, 'Magnitude, dB')
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
