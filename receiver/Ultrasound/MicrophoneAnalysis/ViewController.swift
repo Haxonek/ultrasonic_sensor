@@ -27,6 +27,7 @@ class ViewController: NSViewController {
     var fft: AKFFTTap!
     var booster: AKBooster!
     var frequencyArray: [Double] = []
+    var player: AKPlayer!
 //    let noteFrequencies = [16.35, 17.32, 18.35, 19.45, 20.6, 21.83, 23.12, 24.5, 25.96, 27.5, 29.14, 30.87]
     
     func setupPlot() {
@@ -57,26 +58,24 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         AKSettings.audioInputEnabled = true
         mic = AKMicrophone()
-//        do {
-////            print(AKAudioFile.BaseDirectory.documents)
-//            let cachedFile = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(remote.lastPathComponent)
-//            try? data.write(to: cachedFile)
-//            let player = AKPlayer(url: cachedFile)
-//            let filePath = "/Users/ajenejohnson/ultrasonic_sensor/sound_samples.HF17-LF15-DUR_2ms.wav"
-//            let file = wavFile.path(forResource: filePath, ofType: "wav")
-//            player = try AKAudioPlayer(file: AKAudioFile(readFileName: file!))
-//            booster = AKBooster(player)
-//            tracker = AKFrequencyTracker.init(booster, hopSize: 4096, peakCount: 1)
-//            silence = AKBooster(tracker, gain: 0)
-//            fft = AKFFTTap(tracker)
-//        } catch let error as NSError {
-//            print("There's an error: \(error)")
-//        }
-        booster = AKBooster(mic)
-
-        tracker = AKFrequencyTracker.init(booster, hopSize: 4096, peakCount: 1)
-        silence = AKBooster(tracker, gain: 0)
-        fft = AKFFTTap(tracker)
+        if #available(OSX 10.12, *) {
+            let path = "ultrasonic_sensor/sound_samples/HF17-LF15-DUR-1s.wav"
+            let cachedFile = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(path)
+            player = AKPlayer(url: cachedFile)
+            booster = AKBooster(player)
+            
+            tracker = AKFrequencyTracker.init(booster, hopSize: 4096, peakCount: 1)
+            silence = AKBooster(tracker, gain: 0)
+            fft = AKFFTTap(tracker)
+        } else {
+            // Fallback on earlier versions
+        }
+//        let player = AKPlayer(url: cachedFile)
+//        booster = AKBooster(mic)
+//
+//        tracker = AKFrequencyTracker.init(booster, hopSize: 4096, peakCount: 1)
+//        silence = AKBooster(tracker, gain: 0)
+//        fft = AKFFTTap(tracker)
     }
 
     override func viewDidAppear() {
@@ -88,7 +87,9 @@ class ViewController: NSViewController {
             AKLog("AudioKit did not start!")
         }
         setupPlot()
-        Timer.scheduledTimer(timeInterval: 0.2,
+        player.play()
+        
+        Timer.scheduledTimer(timeInterval: 1,
                              target: self,
                              selector: #selector(ViewController.updateUI),
                              userInfo: nil,
@@ -102,18 +103,20 @@ class ViewController: NSViewController {
     }
 
     @objc func updateUI() {
-        //Don't check for the amplitude
+        if(tracker.frequency < 300){
+            player.play()
+        }
         if(tracker.frequency >= 14500 && tracker.frequency <= 15499) {
             counter+=1
             print(0, terminator:" ")
             frequencyArray.append(tracker.frequency)
-//            print(fft.fftData)
+            //            print(fft.fftData)
         }
         else if(tracker.frequency >= 15500 && tracker.frequency <= 17500) {
             counter+=1
             print(1, terminator:" ")
             frequencyArray.append(tracker.frequency)
-//            print(fft.fftData)
+            //            print(fft.fftData)
         }
         
         if(counter == 14){
@@ -122,6 +125,12 @@ class ViewController: NSViewController {
             print(frequencyArray)
             frequencyArray.removeAll()
         }
+        
+//        if(tracker.frequency < 100){
+//            player.play()
+//        }
+        //Don't check for the amplitude
+        
 //        if tracker.amplitude > 0.1 {
 //
 //            frequencyLabel.stringValue = String(format: "%0.1f", tracker.frequency)
@@ -147,7 +156,7 @@ class ViewController: NSViewController {
 //
 //        }
         
-        
+        frequencyLabel.stringValue = String(format: "%0.2f", tracker.frequency)
         amplitudeLabel.stringValue = String(format: "%0.2f", tracker.amplitude)
     }
 }
