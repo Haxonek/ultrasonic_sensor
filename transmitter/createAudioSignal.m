@@ -1,6 +1,6 @@
 %% Sending data packet
 % data frame information
-bit_duration = 1; % s
+bit_duration = 100*.002; % s
 
 % high = 1 bit, low = 0 bit
 hf = 17000;
@@ -44,11 +44,11 @@ sound(ff, fs)
 
 tt = (1:length(ff)).*(1/fs);
 
-figure
-plot(tt, ff)
-title('output frequency')
-xlabel('time (s)')
-ylabel('frequency (Hz)')
+% figure
+% plot(tt, ff)
+% title('output frequency')
+% xlabel('time (s)')
+% ylabel('frequency (Hz)')
 
 FF = fftshift(fft(ff));
 nn = (-length(FF)/2:length(FF)/2-1)/length(FF);
