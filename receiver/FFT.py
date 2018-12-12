@@ -22,15 +22,61 @@ plot.scatter(frequency, fft0)
 plot.show()
 
 # Used this to generate sample
-preamble = [1, 0, 1];
-header = [0, 0, 1];
-data = [1, 0, 1, 1, 1, 0, 1, 0];
+preamble = [1, 0, 1]
+header = [0, 0, 1]
+data = [1, 0, 1, 1, 1, 0, 1, 0]
 
+#18/14
+dataarray = [18070.22265625, 14068.7646484375, 18209.244140625, 14208.7880859375, 14209.1748046875, 18308.837890625, 18308.76953125, 13808.3720703125, 18108.91015625, 18108.265625, 18108.45703125, 13909.0224609375, 17809.333984375, 14109.2236328125]
+time = range(0, len(dataarray))
+plot.scatter(time, dataarray)
+plot.title('4000 Hz apart')
+plot.axhline(y=np.mean(dataarray), color='r', linestyle='-')
+plot.show()
+
+#17/15
 # Sample Frequencies
 dataarray = [17070.22265625, 15068.7646484375, 17209.244140625, 15208.7880859375, 15209.1748046875, 17308.837890625, 17308.76953125, 14808.3720703125, 17108.91015625, 17108.265625, 17108.45703125, 14909.0224609375, 16809.333984375, 15109.2236328125]
-time = range(0, len(dataarray))
 
 # Plot frequencies with the mean as a threshold for 0 and 1
 plot.scatter(time, dataarray)
+plot.title('2000 Hz apart')
+plot.axhline(y=np.mean(dataarray), color='r', linestyle='-')
+plot.show()
+
+#16.5/15.5
+dataarray = [16570.22265625, 15568.7646484375, 16709.244140625, 15708.7880859375, 15709.1748046875, 16808.837890625, 16808.76953125, 15308.3720703125, 16608.91015625, 16608.265625, 16608.45703125, 15409.0224609375, 16309.333984375, 15609.2236328125]
+
+# Plot frequencies with the mean as a threshold for 0 and 1
+plot.scatter(time, dataarray)
+plot.title('1000 Hz apart')
+plot.axhline(y=np.mean(dataarray), color='r', linestyle='-')
+plot.show()
+
+#16.25/15.75
+dataarray = [16320.22265625, 15818.7646484375, 16459.244140625, 15958.7880859375, 15959.1748046875, 16558.837890625, 16558.76953125, 15558.3720703125, 16358.91015625, 16358.265625, 16059.45703125, 15909.0224609375, 16059.333984375, 15859.2236328125]
+
+# Plot frequencies with the mean as a threshold for 0 and 1
+plot.scatter(time, dataarray)
+plot.title('500 Hz apart')
+plot.axhline(y=np.mean(dataarray), color='r', linestyle='-')
+plot.show()
+
+#16.125/15.875
+dataarray = [16195.22265625, 15943.7646484375, 16334.244140625, 16083.7880859375, 16084.1748046875, 16433.837890625, 16438.76953125, 15683.3720703125, 16233.91015625, 16233.265625, 15934.45703125, 16034.0224609375, 15934.333984375, 15984.2236328125]
+
+# Plot frequencies with the mean as a threshold for 0 and 1
+plot.scatter(time, dataarray)
+plot.title('250 Hz apart')
+plot.axhline(y=np.mean(dataarray), color='r', linestyle='-')
+plot.show()
+
+#1, 0, 1 0, 0, 1 1, 0, 1, 1, 1, 0, 1, 0
+#16.063/15.937
+dataarray = [16132.22265625, 16005.7646484375, 16272.244140625, 16145.7880859375, 16146.1748046875, 16371.837890625, 16376.76953125, 15745.3720703125, 16171.91015625, 16171.265625, 15872.45703125, 16096.0224609375, 15872.333984375, 15922.2236328125]
+
+# Plot frequencies with the mean as a threshold for 0 and 1
+plot.scatter(time, dataarray)
+plot.title('125 Hz apart')
 plot.axhline(y=np.mean(dataarray), color='r', linestyle='-')
 plot.show()

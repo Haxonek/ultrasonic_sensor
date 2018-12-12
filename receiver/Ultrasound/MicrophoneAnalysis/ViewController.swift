@@ -59,7 +59,7 @@ class ViewController: NSViewController {
         AKSettings.audioInputEnabled = true
         mic = AKMicrophone()
         if #available(OSX 10.12, *) {
-            let path = "ultrasonic_sensor/sound_samples/HF17-LF15-DUR-1s.wav"
+            let path = "ultrasonic_sensor/sound_samples/HF17-LF15-DUR-10ms.wav"
             let cachedFile = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(path)
             player = AKPlayer(url: cachedFile)
             booster = AKBooster(player)
@@ -89,7 +89,7 @@ class ViewController: NSViewController {
         setupPlot()
         player.play()
         
-        Timer.scheduledTimer(timeInterval: 1,
+        Timer.scheduledTimer(timeInterval: 0.01,
                              target: self,
                              selector: #selector(ViewController.updateUI),
                              userInfo: nil,
