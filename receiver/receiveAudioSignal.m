@@ -117,15 +117,19 @@ spectrum(tones,Fs,'spectrogram','Leakage',1,'OverlapPercent',0, ...
 
 format long
 
-[x, fs] = audioread('sound_samples/HF17-LF15-DUR-1s.wav');
+% [x, fs] = audioread('sound_samples/HF17-LF15-DUR-2ms.wav');
+[x, fs] = audioread('sound_samples/HF17-LF15-DUR-2ms.wav');
+% [x, fs] = audioread('syn-plse-18-HF-17-LF-16-DUR-1ms.wav');
 
 % x = x((4*fs):length(x)-(2*fs), 1); % 1 s plot
-% x = x((5.22*fs):(5.29*fs), 1); % .2ms plot
-x = x(:, 1); % 20ms plot
+% x = x((5.24*fs):(5.28*fs), 1); % .2ms plot
+x = x(fs*2.17:2.26*fs, 1); % 2ms plot
+% x = x(fs*2:2.2*fs, 1);
+% x = x(:, 1);
 
-wlen = 2^10;                        % window length (recomended to be power of 2) 2^10
+wlen = 2^6;                        % window length (recomended to be power of 2) 2^10
 hop = wlen/2^2;                       % hop size (recomended to be power of 2) 2^2
-nfft = 2^12; % 14                        % number of fft points (recomended to be power of 2) 2^12
+nfft = 2^17; % 14                        % number of fft points (recomended to be power of 2) 2^12
 
 % perform STFT
 win = blackman(wlen, 'periodic');
@@ -151,18 +155,64 @@ end
 S = 20*log10(S + 1e-6);
 % plot the spectrogram
 figure(1)
-surf(t, f, S)
+surf(t, f, S); hold on;
 shading interp
 axis tight
 view(0, 90)
 set(gca, 'FontName', 'Times New Roman', 'FontSize', 14)
 xlabel('Time, s')
 ylabel('Frequency, Hz')
-title('Amplitude spectrogram of the signal')
+title('Amplitude spectrogram of the signal at 2ms')
 hcol = colorbar;
 set(hcol, 'FontName', 'Times New Roman', 'FontSize', 14)
 ylabel(hcol, 'Magnitude, dB')
+ylim([12000,22000])
+
+% plot line on power spectrum plot
+center_frequenies = ones(length(t)) .* 16000;
+
+plot(t, center_frequenies)
 
 
+%% plot errors per delta f
 
+delta_f = [2000, 1000, 500, 250, 125, 62.5];
+errors = [0, 0, 0, 0, 0, 2];
 
+figure
+plot(delta_f, errors); axis on;
+title('Single bit errors at frequencies of \Delta f')
+xlabel('\Delta f from f_{c}')
+ylabel('Errors for each axis')
+ylim([-1,5])
+
+% axis([pl1],[2000 62.5 -1 9])
+
+%% Probability
+
+format long
+
+n = 1:12;
+
+figure
+for total = 160
+
+    prob = 1 - (factorial(total) ./ (total.^n .* factorial(total - n)));
+    
+    plot(n, prob); hold on;
+
+    
+end
+
+prob2 = [0, .003125, .0093554, .018624, .030909, .046051, .063938, .08441, .107304, .13241, .1595, .18841];
+prob9 = zeros(length(n));
+for i = length(n)
+    prob9(i) = prob2(i) * (1-prob2(i))^9;
+end
+    
+plot(n, prob2)
+
+title('Probability of interference in one')
+xlabel('Cars on road within ultrasonic range')
+ylabel('Probability of collision among n car(s)')
+legend('160', '320')
