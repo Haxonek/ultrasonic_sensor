@@ -1,0 +1,17 @@
+function [foundPreambleAndHeader] = findMessageV1(bits)
+
+    preamble = [1 0 1];
+    header = [0 0 1];
+    ph = [preamble, header];
+
+    if length(bits) < 3
+        foundPreambleAndHeader = false;
+        return;
+    end
+
+    for i = 1:length(bits)
+        if (ph(i) != bits(i))
+            foundPreambleAndHeader = false;
+    end
+
+end

@@ -24,18 +24,20 @@ L = length(x);
 
 r = 2; % resolution, larger is worse
 
-frequencies = zeros(ceil(length(x)/(2*r*fs/1000)));
-epsilon = 20; % Hz
-hf = 170;
-lf = 150;
+frequencies = zeros(ceil(length(x)/(2*r*fs/1000)), 1);
+epsilon = 10; % Hz
+hf = 180;
+lf = 160;
 
 index = 0;
-% figure
+figure
 for xx = 1:2*r*fs/1000:length(x)
         
     index = index + 1;
     
-    X = x(xx:min(xx+round(fs/1000 - 1), length(x)));
+    xx = round(xx);
+    
+    X = x( xx:min(xx+round(fs/1000 - 1), length(x)) );
     
     Y = fft(X);
     P2 = abs(Y/length(X));
@@ -45,23 +47,51 @@ for xx = 1:2*r*fs/1000:length(x)
     [val, ind] = max(P1);
     frequencies(index) = f(ind);
     
-%     scatter(index, f(ind)); hold on;
+    scatter(index, f(ind)); hold on;
 
 end
+title('FFT individual data points, bit duration of 2ms')
+xlabel('Increments of 2ms')
 
 display(index)
 
+bits = zeros(length(frequencies), 1);
 % read message
 for i = 1:length(frequencies)
     freq = frequencies(i);
     
     if ((freq > (lf - epsilon)) && (freq < (lf + epsilon)))
-        fprintf('bit: 0\n');
+%         fprintf('bit: 0\n');
     elseif (freq > (hf - epsilon) && freq < (hf + epsilon))
-        fprintf('bit: 1\n');
+%         fprintf('bit: 1\n');
+        bits(i) = 1;
     else
-        fprintf('bit: none, %d \n', freq);
+%         fprintf('bit: none \n');
+        bits(i) = -1;
     end
-    
+
 end
 
+for i = 1:length(bits)
+    
+    if i + 6 > length(bits)
+        break;
+    end
+    
+    isPreamble = findMessageV1(bits(i:i+6));
+    if (isPreamble)
+        disp('Found Preable')
+    
+        code = getCode(bits(i+6:i+11));
+        disp(code);
+
+        distance = getDistance(i+11:i+19);
+        disp(distance);
+    end
+    
+%      1  0  1
+%      0  0  1
+%      1  0  1  1  1 code
+%      0  1  0  0    distance
+    
+end
